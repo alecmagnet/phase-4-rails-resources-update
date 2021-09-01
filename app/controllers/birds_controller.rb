@@ -22,10 +22,26 @@ class BirdsController < ApplicationController
     end
   end
 
+  #PATCH /birds/:id
+  def update
+    bird = Bird.find_by(id: params[:id])
+    bird.update(bird_params)
+    render json: bird, status: :accepted
+  rescue ActiveRecord::RecordInvalid => invalid
+    render json: { errors: invalid.record.errors.full_messages }, status: :unprocessable_entity
+  end
+
+  def increment_likes
+    bird = Bird.find_by(id: params[:id])
+    bird.update(likes: bird.likes + 1)
+  rescue ActiveRecord::RecordInvalid => invalid
+    render json: { errors: invalid.record.errors.full_messages }, status: :not_found
+  end
+
   private
 
   def bird_params
-    params.permit(:name, :species)
+    params.permit(:name, :species, :likes)
   end
 
 end
